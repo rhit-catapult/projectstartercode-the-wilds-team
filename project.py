@@ -89,7 +89,7 @@ class Player(Object):
         self.x = x
         self.y = y
         self.speed = speed
-
+        self.hit_box = pygame.Rect(self.x,self.y, self.sprite.get_width(), self.sprite.get_height())
     def checkmove(self):
         pressedKeys = pygame.key.get_pressed()
         if pressedKeys[pygame.K_RIGHT] or pressedKeys[pygame.K_d]:
@@ -234,8 +234,8 @@ class Open_world:
         self.bg = pygame.transform.scale(self.bg, ((self.bg.get_width() * sprite_multiplier), (self.bg.get_height() * sprite_multiplier)))
         self.click_protect = True
 
-
     def run(self):
+
         self.display.blit(self.bg, (0, 0))
 
         self.player.draw()
@@ -267,7 +267,9 @@ class Open_world:
         self.display.blit(self.stone_score, (190, 40))
         self.player.checkmove()
 
-
+        for trees in self.treeList:
+            hit_any = False
+            if self.player.hit_box.collide.Rect():
 
 
 
