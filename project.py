@@ -7,7 +7,7 @@ import os
 # Game Window
 SCREEN_HEIGHT = 650
 SCREEN_WIDTH = 1250
-FPS = 30
+FPS = 60
 
 # special variables for sizing
 sprite_multiplier = 4
@@ -68,7 +68,7 @@ class Object:
         self.display.blit(self.sprite,(self.x,self.y))
 #Object subclasses, as in Player, Destructable, Enemy
 class Player(Object):
-    def __init__(self, screen, x, y, speed):
+    def __init__(self, screen, x, y, speed, objectList):
         self.filenames = ["graphics/player1_down_idle.png", "graphics/player1_up_idle.png", "graphics/player1_side_idle.png"]
         self.sprite = pygame.image.load(self.filenames[0])
         self.sprite = pygame.transform.scale(self.sprite, (self.sprite.get_width()*sprite_multiplier,self.sprite.get_height()*sprite_multiplier))
@@ -90,29 +90,58 @@ class Player(Object):
         self.y = y
         self.speed = speed
         self.hit_box = pygame.Rect(self.x,self.y, self.sprite.get_width(), self.sprite.get_height())
+        self.objectList = objectList
     def checkmove(self):
         pressedKeys = pygame.key.get_pressed()
         if pressedKeys[pygame.K_RIGHT] or pressedKeys[pygame.K_d]:
             self.x += self.speed
+            self.hit_box.x += self.speed
             self.sprite = self.right
+            for o in self.objectList:
+                if self.hit_box.colliderect(o.hitbox):
+                    self.x -= self.speed
+                    self.hit_box.x -= self.speed
+                    print("hi :)")
         if pressedKeys[pygame.K_LEFT] or pressedKeys[pygame.K_a]:
             self.x -= self.speed
+            self.hit_box.x -= self.speed
             self.sprite = self.left
+            for o in self.objectList:
+                if self.hit_box.colliderect(o.hitbox):
+                    self.x += self.speed
+                    self.hit_box.x += self.speed
+                    print("hi :) 2")
         if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_w]:
             self.y -= self.speed
+            self.hit_box.y -= self.speed
             self.sprite = self.up
+            for o in self.objectList:
+                if self.hit_box.colliderect(o.hitbox):
+                    self.y += self.speed
+                    self.hit_box.y += self.speed
+                    print("hi :) 3")
         if pressedKeys[pygame.K_DOWN] or pressedKeys[pygame.K_s]:
             self.y += self.speed
+            self.hit_box.y += self.speed
             self.sprite = self.down
+            for o in self.objectList:
+                if self.hit_box.colliderect(o.hitbox):
+                    self.y -= self.speed
+                    self.hit_box.y -= self.speed
+                    print(self.hit_box.x, self.hit_box.y, self.x, self.y, o.hitbox.x, o.hitbox.y)
 
         if self.x <= 0:
             self.x=0
+            self.hit_box.x = self.x
         elif self.y <= 0:
-            self.y=0
-        elif self.x >= SCREEN_WIDTH - self.sprite.get_width():
-            self.x = SCREEN_WIDTH - self.sprite.get_width()
-        elif self.y >= SCREEN_HEIGHT - self.sprite.get_height():
-            self.y = SCREEN_HEIGHT - self.sprite.get_height()
+            self.y = 0
+            self.hit_box.y = self.y
+        elif self.x >= self.display.get_width() - self.sprite.get_width():
+            self.x = self.display.get_width() - self.sprite.get_width()
+            self.hit_box.x = self.x
+        elif self.y >= self.display.get_height() - self.sprite.get_height():
+            self.y = self.display.get_height() - self.sprite.get_height()
+            self.hit_box.y = self.y
 
         if (game.gameStateManager.currentState) == "village":
             if self.x <= 0:
@@ -159,7 +188,7 @@ class Destructable(Object):
         self.y = y
         self.break_time = break_time
         self.player_stop = False
-        self.hitbox = pygame.Rect(self.x,self.y,self.sprite.get_width(),self.sprite.get_height())
+        self.hitbox = pygame.Rect(self.x+55,self.y,self.sprite.get_width()-55,self.sprite.get_height())
 
 class Buildable(Object):
     def __init__(self, screen, x, y, sprite_filename, wood_cost, stone_cost):
@@ -170,8 +199,10 @@ class Buildable(Object):
         self.y = y
         self.wood_cost = wood_cost
         self.stone_cost = stone_cost
+        self.hitbox = pygame.Rect((self.x+self.sprite.get_width()/3),(self.y-self.sprite.get_height()/3)+self.sprite.get_height()/2,self.sprite.get_width(),self.sprite.get_height()/2.5)
     def draw(self):
         self.display.blit(self.sprite,(self.x+self.sprite.get_width()/3,self.y-self.sprite.get_height()/3))
+
 
 class BuildPlot(Object):
     def __init__(self,screen,x,y):
@@ -187,11 +218,9 @@ class BuildPlot(Object):
 #Open world gameplay, breaking wood and stone
 class Open_world:
     def __init__(self, display, gameStateManager):
-
         self.font1 = pygame.font.SysFont("comicsansms", 28)
         self.display = display
         self.gameStateManager = gameStateManager
-        self.player = Player(self.display, self.display.get_width()/2, 108, 10)
         first_rock = Destructable(self.display, random.randint(136, self.display.get_width()-136), random.randint(108,self.display.get_height()-108), "graphics/rock.png", 5)
         first_tree = Destructable(self.display, random.randint(0, self.display.get_width()), random.randint(0,self.display.get_height()), "graphics/tree.png", 2)
         self.treeList = []
@@ -210,6 +239,7 @@ class Open_world:
                     new_tree_y = random.randint(trees.sprite.get_height(),
                                                 self.display.get_height() - trees.sprite.get_height())
             new_tree = Destructable(self.display, new_tree_x, new_tree_y, "graphics/tree.png", 5)
+            new_tree.hitbox = pygame.Rect(new_tree.x,new_tree.y,new_tree.sprite.get_width(),new_tree.sprite.get_height())
             self.treeList.append(new_tree)
 
         new_rock_x = random.randint(136, self.display.get_width() - (136))
@@ -223,7 +253,18 @@ class Open_world:
                     new_rock_y = random.randint(rocks.sprite.get_height(),
                                                 self.display.get_height() - rocks.sprite.get_height())
             new_rock = Destructable(self.display, new_rock_x, new_rock_y, "graphics/rock.png", 5)
+            new_rock.hitbox = pygame.Rect(new_rock.x+55,new_rock.y,new_rock.sprite.get_width()-55,new_rock.sprite.get_height())
             self.rockList.append(new_rock)
+
+
+        self.objectList = []
+
+        for trees in self.treeList:
+            self.objectList.append(trees)
+        for rocks in self.rockList:
+            self.objectList.append(rocks)
+
+        self.player = Player(self.display, self.display.get_width() / 2, 108, 5, self.objectList)
 
         global font
         font = pygame.font.SysFont("helveticams", 28)
@@ -253,11 +294,13 @@ class Open_world:
             for tree in self.treeList:
                 if tree.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.treeList.remove(tree)
+                    self.player.objectList.remove(tree)
                     game.itemsfx.play()
                     game.WOOD += 1
             for rock in self.rockList:
                 if rock.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.rockList.remove(rock)
+                    self.player.objectList.remove(rock)
                     game.itemsfx.play()
                     game.STONE += 1
         self.display.blit(self.item_display, (20,20))
@@ -267,9 +310,6 @@ class Open_world:
         self.display.blit(self.stone_score, (190, 40))
         self.player.checkmove()
 
-        for trees in self.treeList:
-            hit_any = False
-            if self.player.hit_box.collide.Rect():
 
 
 
@@ -280,7 +320,6 @@ class Open_world_top:
         self.font1 = pygame.font.SysFont("comicsansms", 28)
         self.display = display
         self.gameStateManager = gameStateManager
-        self.player = Player(self.display, self.display.get_width()/2, self.display.get_height()-108, 10)
         first_rock = Destructable(self.display, random.randint(136, self.display.get_width()-136), random.randint(108,self.display.get_height()-108), "graphics/rock.png", 5)
         first_tree = Destructable(self.display, random.randint(0, self.display.get_width()), random.randint(0,self.display.get_height()), "graphics/tree.png", 2)
         self.treeList = []
@@ -313,6 +352,15 @@ class Open_world_top:
                                                 self.display.get_height() - rocks.sprite.get_height())
             new_rock = Destructable(self.display, new_rock_x, new_rock_y, "graphics/rock.png", 5)
             self.rockList.append(new_rock)
+
+        self.objectList = []
+
+        for trees in self.treeList:
+            self.objectList.append(trees)
+        for rocks in self.rockList:
+            self.objectList.append(rocks)
+
+        self.player = Player(self.display, self.display.get_width() / 2, 108, 5, self.objectList)
 
         global font
         font = pygame.font.SysFont("helveticams", 28)
@@ -342,11 +390,13 @@ class Open_world_top:
             for tree in self.treeList:
                 if tree.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.treeList.remove(tree)
+                    self.player.objectList.remove(tree)
                     game.itemsfx.play()
                     game.WOOD += 1
             for rock in self.rockList:
                 if rock.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.rockList.remove(rock)
+                    self.player.objectList.remove(rock)
                     game.itemsfx.play()
                     game.STONE += 1
         self.display.blit(self.item_display, (20,20))
@@ -366,7 +416,6 @@ class Open_world_right:
         self.font1 = pygame.font.SysFont("comicsansms", 28)
         self.display = display
         self.gameStateManager = gameStateManager
-        self.player = Player(self.display, 64, self.display.get_height()/2, 10)
         first_rock = Destructable(self.display, random.randint(136, self.display.get_width()-136), random.randint(108,self.display.get_height()-108), "graphics/rock.png", 5)
         first_tree = Destructable(self.display, random.randint(0, self.display.get_width()), random.randint(0,self.display.get_height()), "graphics/tree.png", 2)
         self.treeList = []
@@ -400,6 +449,15 @@ class Open_world_right:
             new_rock = Destructable(self.display, new_rock_x, new_rock_y, "graphics/rock.png", 5)
             self.rockList.append(new_rock)
 
+        self.objectList = []
+
+        for trees in self.treeList:
+            self.objectList.append(trees)
+        for rocks in self.rockList:
+            self.objectList.append(rocks)
+
+        self.player = Player(self.display, self.display.get_width() / 2, 108, 5, self.objectList)
+
         global font
         font = pygame.font.SysFont("helveticams", 28)
 
@@ -427,11 +485,13 @@ class Open_world_right:
             for tree in self.treeList:
                 if tree.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.treeList.remove(tree)
+                    self.player.objectList.remove(tree)
                     game.itemsfx.play()
                     game.WOOD += 1
             for rock in self.rockList:
                 if rock.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.rockList.remove(rock)
+                    self.player.objectList.remove(rock)
                     game.itemsfx.play()
                     game.STONE += 1
         self.display.blit(self.item_display, (20,20))
@@ -450,7 +510,6 @@ class Open_world_left:
         self.font1 = pygame.font.SysFont("comicsansms", 28)
         self.display = display
         self.gameStateManager = gameStateManager
-        self.player = Player(self.display, self.display.get_width()-64, self.display.get_height()/2, 10)
         first_rock = Destructable(self.display, random.randint(136, self.display.get_width()-136), random.randint(108,self.display.get_height()-108), "graphics/rock.png", 5)
         first_tree = Destructable(self.display, random.randint(0, self.display.get_width()), random.randint(0,self.display.get_height()), "graphics/tree.png", 2)
         self.treeList = []
@@ -481,6 +540,15 @@ class Open_world_left:
             new_rock = Destructable(self.display, new_rock_x, new_rock_y, "graphics/rock.png", 5)
             self.rockList.append(new_rock)
 
+        self.objectList = []
+
+        for trees in self.treeList:
+            self.objectList.append(trees)
+        for rocks in self.rockList:
+            self.objectList.append(rocks)
+
+        self.player = Player(self.display, self.display.get_width() / 2, 108, 5, self.objectList)
+
         global font
         font = pygame.font.SysFont("helveticams", 28)
 
@@ -508,11 +576,13 @@ class Open_world_left:
             for tree in self.treeList:
                 if tree.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.treeList.remove(tree)
+                    self.player.objectList.remove(tree)
                     game.itemsfx.play()
                     game.WOOD += 1
             for rock in self.rockList:
                 if rock.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.rockList.remove(rock)
+                    self.player.objectList.remove(rock)
                     game.itemsfx.play()
                     game.STONE += 1
         self.display.blit(self.item_display, (20,20))
@@ -533,15 +603,21 @@ class Village:
         self.font1 = pygame.font.SysFont("comicsansms", 28)
         self.display = display
         self.gameStateManager = gameStateManager
-        self.buildplot1 = BuildPlot(self.display, 40, 130)
-        self.buildplot2 = BuildPlot(self.display, 740, 130)
-        self.buildplot3 = BuildPlot(self.display, 40, 500)
-        self.buildplot4 = BuildPlot(self.display, 740, 500)
+        self.buildplot1 = BuildPlot(self.display, 130, 160)
+        self.buildplot2 = BuildPlot(self.display, 860, 160)
+        self.buildplot3 = BuildPlot(self.display, 130, 500)
+        self.buildplot4 = BuildPlot(self.display, 860, 500)
         self.plotList.append(self.buildplot1)
         self.plotList.append(self.buildplot2)
         self.plotList.append(self.buildplot3)
         self.plotList.append(self.buildplot4)
-        self.player = Player(self.display, self.display.get_width()/2, self.display.get_height()/2, 10)
+
+        self.objectList = []
+
+        for plot in self.plotList:
+            self.objectList.append(plot)
+
+        self.player = Player(self.display, self.display.get_width() / 2, 108, 5, self.objectList)
 
         global font
         font = pygame.font.SysFont("helveticams", 28)
@@ -553,7 +629,7 @@ class Village:
         self.bg = pygame.transform.scale(self.bg, ((self.bg.get_width() * sprite_multiplier), (self.bg.get_height() * sprite_multiplier)))
         self.click_protect = True
         self.tutorial_text_trigger = True
-        self.tutorial_text = font.render("Use 5 Logs and 4 Stone to Make a House!", True, (0,0,0))
+        self.tutorial_text = font.render("Click 5 trees and 4 stones then build a house here!", True, (0,0,0))
 
 
 
@@ -591,12 +667,16 @@ class Village:
             self.click_protect = False
             for plots in self.plotList:
                 if plots.hitbox.collidepoint(pygame.mouse.get_pos()) and game.WOOD >= 5 and game.STONE >= 4:
-                    new_house = Buildable(self.display, plots.x, plots.y-76, "graphics/house_mid.png", 5, 4)
+                    new_house = Buildable(self.display, plots.x-(plots.sprite.get_width()/3), plots.y-36, "graphics/house_mid.png", 5, 4)
+                    new_house.y -= 20
                     game.buildsfx.play()
                     game.houseList.append(new_house)
                     self.plotList.remove(plots)
+                    self.player.objectList.remove(plots)
                     game.WOOD -= 5
                     game.STONE -= 4
+                    self.player.objectList.append(new_house)
+
 
 
 
