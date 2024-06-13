@@ -101,7 +101,6 @@ class Player(Object):
                 if self.hit_box.colliderect(o.hitbox):
                     self.x -= self.speed
                     self.hit_box.x -= self.speed
-                    print("hi :)")
         if pressedKeys[pygame.K_LEFT] or pressedKeys[pygame.K_a]:
             self.x -= self.speed
             self.hit_box.x -= self.speed
@@ -110,7 +109,6 @@ class Player(Object):
                 if self.hit_box.colliderect(o.hitbox):
                     self.x += self.speed
                     self.hit_box.x += self.speed
-                    print("hi :) 2")
         if pressedKeys[pygame.K_UP] or pressedKeys[pygame.K_w]:
             self.y -= self.speed
             self.hit_box.y -= self.speed
@@ -119,7 +117,6 @@ class Player(Object):
                 if self.hit_box.colliderect(o.hitbox):
                     self.y += self.speed
                     self.hit_box.y += self.speed
-                    print("hi :) 3")
         if pressedKeys[pygame.K_DOWN] or pressedKeys[pygame.K_s]:
             self.y += self.speed
             self.hit_box.y += self.speed
@@ -128,7 +125,6 @@ class Player(Object):
                 if self.hit_box.colliderect(o.hitbox):
                     self.y -= self.speed
                     self.hit_box.y -= self.speed
-                    print(self.hit_box.x, self.hit_box.y, self.x, self.y, o.hitbox.x, o.hitbox.y)
 
         if self.x <= 0:
             self.x=0
@@ -360,7 +356,7 @@ class Open_world_top:
         for rocks in self.rockList:
             self.objectList.append(rocks)
 
-        self.player = Player(self.display, self.display.get_width() / 2, 108, 5, self.objectList)
+        self.player = Player(self.display, self.display.get_width() / 2, self.display.get_width()-108, 5, self.objectList)
 
         global font
         font = pygame.font.SysFont("helveticams", 28)
@@ -456,7 +452,7 @@ class Open_world_right:
         for rocks in self.rockList:
             self.objectList.append(rocks)
 
-        self.player = Player(self.display, self.display.get_width() / 2, 108, 5, self.objectList)
+        self.player = Player(self.display, 64, self.display.get_height()/2, 5, self.objectList)
 
         global font
         font = pygame.font.SysFont("helveticams", 28)
@@ -547,7 +543,7 @@ class Open_world_left:
         for rocks in self.rockList:
             self.objectList.append(rocks)
 
-        self.player = Player(self.display, self.display.get_width() / 2, 108, 5, self.objectList)
+        self.player = Player(self.display, self.display.get_width()-64, self.display.get_height()/2, 5, self.objectList)
 
         global font
         font = pygame.font.SysFont("helveticams", 28)
