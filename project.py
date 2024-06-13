@@ -195,7 +195,7 @@ class Buildable(Object):
         self.y = y
         self.wood_cost = wood_cost
         self.stone_cost = stone_cost
-        self.hitbox = pygame.Rect((self.x+self.sprite.get_width()/3),(self.y-self.sprite.get_height()/3)+self.sprite.get_height()/2,self.sprite.get_width(),self.sprite.get_height()/2.5)
+        self.hitbox = pygame.Rect((self.x+self.sprite.get_width()/3)+10,(self.y-self.sprite.get_height()/3)+self.sprite.get_height()/2,self.sprite.get_width()-20,self.sprite.get_height()/2.5)
     def draw(self):
         self.display.blit(self.sprite,(self.x+self.sprite.get_width()/3,self.y-self.sprite.get_height()/3))
 
