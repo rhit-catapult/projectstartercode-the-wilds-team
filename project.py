@@ -221,8 +221,11 @@ class Open_world:
         first_tree = Destructable(self.display, random.randint(0, self.display.get_width()), random.randint(0,self.display.get_height()), "graphics/tree.png", 2)
         self.treeList = []
         self.treeList.append(first_tree)
+        first_tree.hitbox = pygame.Rect(first_tree.x, first_tree.y, first_tree.sprite.get_width(),first_tree.sprite.get_height())
+
         self.rockList = []
         self.rockList.append(first_rock)
+        first_rock.hitbox = pygame.Rect(first_rock.x+10, first_rock.y, first_rock.sprite.get_width() - 20,first_rock.sprite.get_height())
 
         new_tree_x = random.randint((58 * sprite_multiplier), self.display.get_width() - (58 * sprite_multiplier))
         new_tree_y = random.randint((88), self.display.get_height() - (88))
@@ -249,7 +252,7 @@ class Open_world:
                     new_rock_y = random.randint(rocks.sprite.get_height(),
                                                 self.display.get_height() - rocks.sprite.get_height())
             new_rock = Destructable(self.display, new_rock_x, new_rock_y, "graphics/rock.png", 5)
-            new_rock.hitbox = pygame.Rect(new_rock.x+55,new_rock.y,new_rock.sprite.get_width()-55,new_rock.sprite.get_height())
+            new_rock.hitbox = pygame.Rect(new_rock.x+10,new_rock.y,new_rock.sprite.get_width()-20,new_rock.sprite.get_height())
             self.rockList.append(new_rock)
 
 
@@ -282,11 +285,7 @@ class Open_world:
         for tree in self.treeList:
             tree.draw()
 
-        if not pygame.mouse.get_pressed()[0]:
-            self.click_protect = True
-
         if pygame.mouse.get_pressed()[0]:
-            self.click_protect = False
             for tree in self.treeList:
                 if tree.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.treeList.remove(tree)
@@ -320,8 +319,13 @@ class Open_world_top:
         first_tree = Destructable(self.display, random.randint(0, self.display.get_width()), random.randint(0,self.display.get_height()), "graphics/tree.png", 2)
         self.treeList = []
         self.treeList.append(first_tree)
+        first_tree.hitbox = pygame.Rect(first_tree.x, first_tree.y, first_tree.sprite.get_width(),
+                                        first_tree.sprite.get_height())
+
         self.rockList = []
         self.rockList.append(first_rock)
+        first_rock.hitbox = pygame.Rect(first_rock.x + 10, first_rock.y, first_rock.sprite.get_width() - 20,
+                                        first_rock.sprite.get_height())
 
         new_tree_x = random.randint((58 * sprite_multiplier), self.display.get_width() - (58 * sprite_multiplier))
         new_tree_y = random.randint((88), self.display.get_height() - (88))
@@ -329,11 +333,10 @@ class Open_world_top:
             for trees in self.treeList:
                 hitbox = pygame.Rect(trees.x, trees.y, trees.sprite.get_width(), trees.sprite.get_height())
                 while hitbox.collidepoint(new_tree_x, new_tree_y):
-                    new_tree_x = random.randint(trees.sprite.get_width(),
-                                                self.display.get_width() - trees.sprite.get_width())
-                    new_tree_y = random.randint(trees.sprite.get_height(),
-                                                self.display.get_height() - trees.sprite.get_height())
+                    new_tree_x = random.randint(trees.sprite.get_width(),self.display.get_width() - trees.sprite.get_width())
+                    new_tree_y = random.randint(trees.sprite.get_height(),self.display.get_height() - trees.sprite.get_height())
             new_tree = Destructable(self.display, new_tree_x, new_tree_y, "graphics/tree.png", 5)
+            new_tree.hitbox = pygame.Rect(new_tree.x, new_tree.y, new_tree.sprite.get_width(),new_tree.sprite.get_height())
             self.treeList.append(new_tree)
 
         new_rock_x = random.randint(136, self.display.get_width() - (136))
@@ -342,11 +345,10 @@ class Open_world_top:
             for rocks in self.rockList:
                 hitbox = pygame.Rect(rocks.x, rocks.y, rocks.sprite.get_width(), rocks.sprite.get_height())
                 while hitbox.collidepoint(new_rock_x, new_rock_y):
-                    new_rock_x = random.randint(rocks.sprite.get_width(),
-                                                self.display.get_width() - rocks.sprite.get_width())
-                    new_rock_y = random.randint(rocks.sprite.get_height(),
-                                                self.display.get_height() - rocks.sprite.get_height())
+                    new_rock_x = random.randint(rocks.sprite.get_width(),self.display.get_width() - rocks.sprite.get_width())
+                    new_rock_y = random.randint(rocks.sprite.get_height(),self.display.get_height() - rocks.sprite.get_height())
             new_rock = Destructable(self.display, new_rock_x, new_rock_y, "graphics/rock.png", 5)
+            new_rock.hitbox = pygame.Rect(new_rock.x + 10, new_rock.y, new_rock.sprite.get_width() - 20,new_rock.sprite.get_height())
             self.rockList.append(new_rock)
 
         self.objectList = []
@@ -365,7 +367,7 @@ class Open_world_top:
         self.item_display = pygame.transform.scale(self.item_display, (self.item_display.get_width()*2, self.item_display.get_height()*2))
         self.bg = pygame.image.load("graphics/forestbgtop.png")
         self.bg = pygame.transform.scale(self.bg, ((self.bg.get_width() * sprite_multiplier), (self.bg.get_height() * sprite_multiplier)))
-        self.click_protect = True
+
 
 
     def run(self):
@@ -378,11 +380,8 @@ class Open_world_top:
         for tree in self.treeList:
             tree.draw()
 
-        if not pygame.mouse.get_pressed()[0]:
-            self.click_protect = True
 
         if pygame.mouse.get_pressed()[0]:
-            self.click_protect = False
             for tree in self.treeList:
                 if tree.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.treeList.remove(tree)
@@ -416,8 +415,13 @@ class Open_world_right:
         first_tree = Destructable(self.display, random.randint(0, self.display.get_width()), random.randint(0,self.display.get_height()), "graphics/tree.png", 2)
         self.treeList = []
         self.treeList.append(first_tree)
+        first_tree.hitbox = pygame.Rect(first_tree.x, first_tree.y, first_tree.sprite.get_width(),
+                                        first_tree.sprite.get_height())
+
         self.rockList = []
         self.rockList.append(first_rock)
+        first_rock.hitbox = pygame.Rect(first_rock.x + 10, first_rock.y, first_rock.sprite.get_width() - 20,
+                                        first_rock.sprite.get_height())
 
         new_tree_x = random.randint((58 * sprite_multiplier), self.display.get_width() - (58 * sprite_multiplier))
         new_tree_y = random.randint((88), self.display.get_height() - (88))
@@ -430,6 +434,8 @@ class Open_world_right:
                     new_tree_y = random.randint(trees.sprite.get_height(),
                                                 self.display.get_height() - trees.sprite.get_height())
             new_tree = Destructable(self.display, new_tree_x, new_tree_y, "graphics/tree.png", 5)
+            new_tree.hitbox = pygame.Rect(new_tree.x, new_tree.y, new_tree.sprite.get_width(),
+                                          new_tree.sprite.get_height())
             self.treeList.append(new_tree)
 
         new_rock_x = random.randint(136, self.display.get_width() - (136))
@@ -443,6 +449,8 @@ class Open_world_right:
                     new_rock_y = random.randint(rocks.sprite.get_height(),
                                                 self.display.get_height() - rocks.sprite.get_height())
             new_rock = Destructable(self.display, new_rock_x, new_rock_y, "graphics/rock.png", 5)
+            new_rock.hitbox = pygame.Rect(new_rock.x + 10, new_rock.y, new_rock.sprite.get_width() - 20,
+                                          new_rock.sprite.get_height())
             self.rockList.append(new_rock)
 
         self.objectList = []
@@ -461,7 +469,7 @@ class Open_world_right:
         self.item_display = pygame.transform.scale(self.item_display, (self.item_display.get_width()*2, self.item_display.get_height()*2))
         self.bg = pygame.image.load("graphics/forestbgleft.png")
         self.bg = pygame.transform.scale(self.bg, ((self.bg.get_width() * sprite_multiplier), (self.bg.get_height() * sprite_multiplier)))
-        self.click_protect = True
+
 
     def run(self):
         self.display.blit(self.bg, (0, 0))
@@ -473,11 +481,8 @@ class Open_world_right:
         for tree in self.treeList:
             tree.draw()
 
-        if not pygame.mouse.get_pressed()[0]:
-            self.click_protect = True
 
         if pygame.mouse.get_pressed()[0]:
-            self.click_protect = False
             for tree in self.treeList:
                 if tree.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.treeList.remove(tree)
@@ -510,30 +515,41 @@ class Open_world_left:
         first_tree = Destructable(self.display, random.randint(0, self.display.get_width()), random.randint(0,self.display.get_height()), "graphics/tree.png", 2)
         self.treeList = []
         self.treeList.append(first_tree)
+        first_tree.hitbox = pygame.Rect(first_tree.x, first_tree.y, first_tree.sprite.get_width(),
+                                        first_tree.sprite.get_height())
+
         self.rockList = []
         self.rockList.append(first_rock)
+        first_rock.hitbox = pygame.Rect(first_rock.x + 10, first_rock.y, first_rock.sprite.get_width() - 20,
+                                        first_rock.sprite.get_height())
 
-        new_tree_x = random.randint((58*sprite_multiplier), self.display.get_width() - (58*sprite_multiplier))
+        new_tree_x = random.randint((58 * sprite_multiplier), self.display.get_width() - (58 * sprite_multiplier))
         new_tree_y = random.randint((88), self.display.get_height() - (88))
         for i in range(random.randint(6, 9)):
             for trees in self.treeList:
                 hitbox = pygame.Rect(trees.x, trees.y, trees.sprite.get_width(), trees.sprite.get_height())
-                while hitbox.colliderect(pygame.Rect(new_tree_x, new_tree_y,trees.sprite.get_width(),trees.sprite.get_height())):
-                    new_tree_x = random.randint(trees.sprite.get_width(),self.display.get_width() - trees.sprite.get_width())
-                    new_tree_y = random.randint(trees.sprite.get_height(),self.display.get_height() - trees.sprite.get_height())
+                while hitbox.collidepoint(new_tree_x, new_tree_y):
+                    new_tree_x = random.randint(trees.sprite.get_width(),
+                                                self.display.get_width() - trees.sprite.get_width())
+                    new_tree_y = random.randint(trees.sprite.get_height(),
+                                                self.display.get_height() - trees.sprite.get_height())
             new_tree = Destructable(self.display, new_tree_x, new_tree_y, "graphics/tree.png", 5)
+            new_tree.hitbox = pygame.Rect(new_tree.x, new_tree.y, new_tree.sprite.get_width(),
+                                          new_tree.sprite.get_height())
             self.treeList.append(new_tree)
 
-
-        new_rock_x = random.randint(136,self.display.get_width() - (136))
-        new_rock_y = random.randint((27*sprite_multiplier),self.display.get_height() - (27*sprite_multiplier))
+        new_rock_x = random.randint(136, self.display.get_width() - (136))
+        new_rock_y = random.randint((27 * sprite_multiplier), self.display.get_height() - (27 * sprite_multiplier))
         for i in range(random.randint(4, 6)):
             for rocks in self.rockList:
                 hitbox = pygame.Rect(rocks.x, rocks.y, rocks.sprite.get_width(), rocks.sprite.get_height())
-                while hitbox.colliderect(pygame.Rect(new_rock_x, new_rock_y,rocks.sprite.get_width(),rocks.sprite.get_height())):
-                    new_rock_x = random.randint(rocks.sprite.get_width(),self.display.get_width() - rocks.sprite.get_width())
-                    new_rock_y = random.randint(rocks.sprite.get_height(),self.display.get_height() - rocks.sprite.get_height())
+                while hitbox.collidepoint(new_rock_x, new_rock_y):
+                    new_rock_x = random.randint(rocks.sprite.get_width(),
+                                                self.display.get_width() - rocks.sprite.get_width())
+                    new_rock_y = random.randint(rocks.sprite.get_height(),
+                                                self.display.get_height() - rocks.sprite.get_height())
             new_rock = Destructable(self.display, new_rock_x, new_rock_y, "graphics/rock.png", 5)
+            new_rock.hitbox = pygame.Rect(new_rock.x + 10, new_rock.y, new_rock.sprite.get_width() - 20,new_rock.sprite.get_height())
             self.rockList.append(new_rock)
 
         self.objectList = []
@@ -552,7 +568,6 @@ class Open_world_left:
         self.item_display = pygame.transform.scale(self.item_display, (self.item_display.get_width()*2, self.item_display.get_height()*2))
         self.bg = pygame.image.load("graphics/forestbgright.png")
         self.bg = pygame.transform.scale(self.bg, ((self.bg.get_width() * sprite_multiplier), (self.bg.get_height() * sprite_multiplier)))
-        self.click_protect = True
 
     def run(self):
         self.display.blit(self.bg, (0, 0))
@@ -564,11 +579,8 @@ class Open_world_left:
         for tree in self.treeList:
             tree.draw()
 
-        if not pygame.mouse.get_pressed()[0]:
-            self.click_protect = True
 
         if pygame.mouse.get_pressed()[0]:
-            self.click_protect = False
             for tree in self.treeList:
                 if tree.hitbox.collidepoint(pygame.mouse.get_pos()):
                     self.treeList.remove(tree)
